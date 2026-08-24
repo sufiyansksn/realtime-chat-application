@@ -73,6 +73,11 @@ function ChatWindow({ selectedChat }){
     const [messages, setMessages] = useState([]);
 
     const messagesEndRef = useRef(null);
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({
+            behavior: "smooth",
+        });
+    },[messages])
 
     useEffect(() => {
         setMessages(chatMessages[selectedChat] || []);
@@ -128,6 +133,8 @@ function ChatWindow({ selectedChat }){
                         <span>{message.time}</span>
                     </div>
                 ))}
+                <div ref={messagesEndRef}></div>
+
             </div>
 
             {/* Message Input */}
