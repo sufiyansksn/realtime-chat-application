@@ -1,5 +1,13 @@
 import "./ChatWindow.css";
 import { useState, useEffect, useRef } from "react";
+import { createWebSocket } from "../services/websocket";
+
+
+const chatRooms = {
+    Ahmed: 6,
+    Family: 7,
+    "Work Group": 8,
+};
 
 const chatMessages = {
     Ahmed: [
@@ -67,17 +75,53 @@ const chatMessages = {
 };
 
 function ChatWindow({ selectedChat }){
+
+    //websocket connections 
+    const roomId = chatRooms[selectedChat];
+
+    useEffect(() => {
+        const socket = createWebSocket(roomId);
+
+        //When the connection actually becomes OPEN, execute this function.
+        socket.onopen = () => {
+            console.log("Websocket Connected!")
+        }
+
+        socket.onmessage = (event) => {
+            const message = JSON.parse(event.data)
+
+            const formattedMessage = {
+                id: message.id,
+                type: message.sender === 1 ? "sent" : "received",
+                content: message.content,
+                time: new Date(message.created_at).toLocaleTimeString([],{ hour: "2-digit", minute: "2-digit",}),
+            }   
+
+            setMessages((previousMessages) => [
+                ...previousMessages,
+                formattedMessage,
+            ]);
+
+            //console.log("Message from server:", message)
+        }
+
+        return () => {
+            socket.close();
+        };
+    }, [roomId]);
     
     const [messageText, setMessageText] = useState("");
 
     const [messages, setMessages] = useState([]);
 
     const messagesEndRef = useRef(null);
+    
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({
             behavior: "smooth",
         });
     },[messages])
+
 
     useEffect(() => {
         setMessages(chatMessages[selectedChat] || []);
