@@ -79,8 +79,16 @@ function ChatWindow({ selectedChat }){
     //websocket connections 
     const roomId = chatRooms[selectedChat];
 
+    const [messageText, setMessageText] = useState("");
+    const [messages, setMessages] = useState([]);
+
+    const messagesEndRef = useRef(null);
+    const socketRef = useRef(null)
+
     useEffect(() => {
         const socket = createWebSocket(roomId);
+
+        socketRef.current = socket;
 
         //When the connection actually becomes OPEN, execute this function.
         socket.onopen = () => {
@@ -109,12 +117,6 @@ function ChatWindow({ selectedChat }){
             socket.close();
         };
     }, [roomId]);
-    
-    const [messageText, setMessageText] = useState("");
-
-    const [messages, setMessages] = useState([]);
-
-    const messagesEndRef = useRef(null);
     
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({
