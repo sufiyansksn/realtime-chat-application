@@ -135,13 +135,8 @@ function ChatWindow({ selectedChat }){
         if (!messageText.trim()) {
             return;
         }
-        const newMessage = {
-            id: Date.now(),
-            type: "sent",
-            content: messageText,
-            time: "Now"
-        };
-        setMessages([...messages, newMessage])
+
+        socketRef.current.send(messageText);
 
         setMessageText("");
     }
