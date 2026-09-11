@@ -11,6 +11,8 @@ import os
 
 print("🚀 ASGI LOADED")
 
+from authentication.middleware import JWTAuthMiddleware
+
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter
 from channels.routing import URLRouter
@@ -27,7 +29,7 @@ django_asgi_app = get_asgi_application()
 application = ProtocolTypeRouter({
     "http" : django_asgi_app,
 
-    "websocket":AuthMiddlewareStack(
+    "websocket":JWTAuthMiddleware(
             URLRouter(
                 websocket_urlpatterns
             )
