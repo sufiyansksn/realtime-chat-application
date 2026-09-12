@@ -5,6 +5,7 @@ from channels.db import database_sync_to_async
 from django.contrib.auth import get_user_model
 
 from rest_framework_simplejwt.tokens import UntypedToken
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 
 @database_sync_to_async
 def get_user(user_id):
@@ -27,14 +28,32 @@ class JWTAuthMiddleware(BaseMiddleware):
         print("Token:", token)
 
         if token:
-            validated_token = UntypedToken(token)
-            user_id = validated_token["user_id"]
+            try:
+                validated_token = UntypedToken(token)
+                user_id = validated_token["user_id"]
 
-            print("User ID:", user_id)
+                print("User ID:", user_id)
 
-            user = await get_user(user_id)
-            print("User:", user)
-            
-            scope["user"] = user
+                user = await get_user(user_id)
+                print("User:", user)
+                
+                scope["user"] = user
+
+            except TokenError:
+                print("invalid or expired JWT token")
+
+                await send({
+                    "type": "websocket.close",
+                    "code": 4001,
+                })
+
+                return 
+        else:
+            print("No JWt provided")
+            await send({
+                "type": "websocket.close",
+                "code": 4001
+            })
+            return 
 
         return await super().__call__(scope, receive, send)
