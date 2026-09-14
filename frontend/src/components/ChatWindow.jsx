@@ -10,70 +10,7 @@ const chatRooms = {
     "Work Group": 8,
 };
 
-const chatMessages = {
-    Ahmed: [
-        {
-            id: 1,
-            type: "received",
-            content: "Hey Sufiyan! 👋",
-            time: "10:30",
-        },
-        {
-            id: 2,
-            type: "sent",
-            content: "Hey Ahmed! How are you?",
-            time: "10:31",
-        },
-        {
-            id: 3,
-            type: "received",
-            content: "I'm doing great! How about you?",
-            time: "10:32",
-        },
-        {
-            id: 4,
-            type: "sent",
-            content: "I'm good too 😊",
-            time: "10:33",
-        },
-    ],
 
-    Family: [
-        {
-            id: 5,
-            type: "received",
-            content: "Good morning everyone! ☀️",
-            time: "09:15",
-        },
-        {
-        id: 6,
-        type: "sent",
-        content: "Good morning!",
-        time: "09:17",
-        },
-        {
-        id: 7,
-        type: "received",
-        content: "What are you doing today?",
-        time: "09:20",
-        },
-    ],
-
-    "Work Group": [
-        {
-            id: 8,
-            type: "received",
-            content: "Meeting at 5 PM.",
-            time: "08:45",
-        },
-        {
-        id: 9,
-        type: "sent",
-        content: "Okay, I'll be there.",
-        time: "08:47",
-        },
-    ],
-};
 
 function ChatWindow({ selectedChat }){
 
@@ -138,17 +75,13 @@ function ChatWindow({ selectedChat }){
         };
 
     }, [roomId, currentUser]);
+
     
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({
             behavior: "smooth",
         });
     },[messages])
-
-
-    useEffect(() => {
-        setMessages(chatMessages[selectedChat] || []);
-    }, [selectedChat]);
 
 
 
