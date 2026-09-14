@@ -57,7 +57,7 @@ class ChatConsumer(WebsocketConsumer):
         #2. Save the messages to database.
         message = Message.objects.create(
             room=room,
-            sender=User.objects.get(id=1),
+            sender=self.scope["user"],
             content=text_data
         )
 

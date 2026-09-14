@@ -9,9 +9,13 @@ from users.serializers import UserSerializer
 
 class MeView(APIView):
     
-    permission_clasess = [IsAuthenticated]
-
+    permission_classes = [IsAuthenticated]
+    
     def get(self,request):
+        print("ME Authorization:", request.headers.get("Authorization"))
+        print("ME request user:", request.user)
+        print("ME request user_id:", request.user.id)
+
         user = request.user
         
         serializer = UserSerializer(user)

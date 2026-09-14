@@ -49,7 +49,7 @@ class JWTAuthMiddleware(BaseMiddleware):
 
                 return 
         else:
-            print("No JWt provided")
+            print("No JWt token provided")
             await send({
                 "type": "websocket.close",
                 "code": 4001

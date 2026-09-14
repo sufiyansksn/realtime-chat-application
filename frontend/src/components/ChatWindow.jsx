@@ -1,6 +1,7 @@
 import "./ChatWindow.css";
 import { useState, useEffect, useRef } from "react";
 import { createWebSocket } from "../services/websocket";
+import { getCurrentUser } from "../services/auth";
 
 
 const chatRooms = {
@@ -76,6 +77,7 @@ const chatMessages = {
 
 function ChatWindow({ selectedChat }){
 
+
     //websocket connections 
     const roomId = chatRooms[selectedChat];
 
@@ -84,6 +86,16 @@ function ChatWindow({ selectedChat }){
 
     const messagesEndRef = useRef(null);
     const socketRef = useRef(null)
+
+
+    useEffect(() => {
+        getCurrentUser().then((user) => {
+            console.log("CurrentUser:", user)
+        }) 
+        .catch((error) => {
+            console.error("getCurrentUser ERROR:", error);
+        });
+    }, []);
 
     useEffect(() => {
         const socket = createWebSocket(roomId);
