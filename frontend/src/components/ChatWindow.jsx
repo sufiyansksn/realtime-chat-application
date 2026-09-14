@@ -43,6 +43,8 @@ function ChatWindow({ selectedChat }){
             return;
         }
 
+        setMessages([]);
+
         const socket = createWebSocket(roomId);
 
         socketRef.current = socket;
