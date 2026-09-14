@@ -87,10 +87,13 @@ function ChatWindow({ selectedChat }){
     const messagesEndRef = useRef(null);
     const socketRef = useRef(null)
 
+    const [currentUser, setCurrentUser] = useState(null);
+
 
     useEffect(() => {
         getCurrentUser().then((user) => {
             console.log("CurrentUser:", user)
+            setCurrentUser(user)
         }) 
         .catch((error) => {
             console.error("getCurrentUser ERROR:", error);
@@ -98,6 +101,11 @@ function ChatWindow({ selectedChat }){
     }, []);
 
     useEffect(() => {
+        
+        if (!currentUser){
+            return;
+        }
+
         const socket = createWebSocket(roomId);
 
         socketRef.current = socket;
@@ -112,7 +120,7 @@ function ChatWindow({ selectedChat }){
 
             const formattedMessage = {
                 id: message.id,
-                type: message.sender === 1 ? "sent" : "received",
+                type: message.sender === currentUser.id ? "sent" : "received",
                 content: message.content,
                 time: new Date(message.created_at).toLocaleTimeString([],{ hour: "2-digit", minute: "2-digit",}),
             }   
@@ -124,11 +132,12 @@ function ChatWindow({ selectedChat }){
 
             //console.log("Message from server:", message)
         }
-
+        // stops old websocket connection.
         return () => {
             socket.close();
         };
-    }, [roomId]);
+
+    }, [roomId, currentUser]);
     
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({
