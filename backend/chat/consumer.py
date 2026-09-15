@@ -2,9 +2,18 @@ import json
 
 from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
-from .models import Room, Message
 from users.models import User
 
+from .models import Room, RoomMembership, Message
+from channels.db import database_sync_to_async
+
+
+@database_sync_to_async
+def is_room_member(room_id, user):
+    return RoomMembership.objects.filter(
+        room_id = room_id,
+        user = user
+    ).exists()
 
 class ChatConsumer(WebsocketConsumer):
 
@@ -12,6 +21,15 @@ class ChatConsumer(WebsocketConsumer):
 
         #getting the room-id from the "websockets url"
         self.room_id = self.scope["url_route"]["kwargs"]["room_id"]
+
+        is_member = async_to_sync(is_room_member)(
+            self.room_id,
+            self.scope["user"]
+        )
+
+        if not is_member:
+            self.close(code=4003)
+            return
 
         #create group name
         self.room_group_name = f"room_{self.room_id}"
