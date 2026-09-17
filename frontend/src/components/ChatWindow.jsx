@@ -12,11 +12,13 @@ const chatRooms = {
 
 
 
-function ChatWindow({ selectedChat }){
+function ChatWindow({ selectedChat, rooms }){
 
 
     //websocket connections 
-    const roomId = chatRooms[selectedChat];
+    const selectedRoom = rooms.find((room) => room.name === selectedChat);
+    
+    const roomId = selectedRoom?.id;
 
     const [messageText, setMessageText] = useState("");
     const [messages, setMessages] = useState([]);
@@ -39,7 +41,7 @@ function ChatWindow({ selectedChat }){
 
     useEffect(() => {
         
-        if (!currentUser){
+        if ( !currentUser || !roomId ){
             return;
         }
 

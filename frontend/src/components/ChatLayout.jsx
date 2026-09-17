@@ -1,11 +1,23 @@
 import "./ChatLayout.css";
 import Sidebar from "./Sidebar";
 import ChatWindow from "./ChatWindow";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+import { getChatRooms } from "../services/auth";
 
 function ChatLayout() {
 
-    const[selectedChat, setSelectedChat] = useState("Ahmed");
+    const[selectedChat, setSelectedChat] = useState("");
+    const [rooms, setRooms] = useState([]);
+
+    useEffect(() => {
+        getChatRooms().then((rooms) => {
+            setRooms(rooms)
+        })
+        .catch((error) => {
+            console.error("getChatrooms error:", error);
+        });
+    },[]);
 
     return (
         <div className="chat-layout">
@@ -15,12 +27,17 @@ function ChatLayout() {
             <Sidebar 
                 selectedChat = {selectedChat}
                 setSelectedChat = {setSelectedChat}
+                rooms = {rooms}
             />
         </aside>
 
         {/* Right side */}
         <main className="chat-window">
-            <ChatWindow selectedChat={selectedChat} />
+            <ChatWindow 
+                selectedChat={selectedChat}
+                rooms={rooms}
+            />
+
         </main>
 
         </div>

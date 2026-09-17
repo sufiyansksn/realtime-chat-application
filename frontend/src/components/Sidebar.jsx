@@ -1,7 +1,7 @@
 import "./Sidebar.css";
 
 
-function Sidebar({ selectedChat, setSelectedChat}) {
+function Sidebar({ selectedChat, setSelectedChat, rooms }) {
     return (
         <div className="sidebar-content">
 
@@ -29,43 +29,27 @@ function Sidebar({ selectedChat, setSelectedChat}) {
             {/* Chats List */}
             <div className="chat-list">
 
-                <div className={`chat-item ${selectedChat === "Ahmed" ? "active-chat" : "" }`}
-                    onClick={() => setSelectedChat("Ahmed")} >
+                {rooms.map((room) => (
+                    <div
+                        key={room.id}
+                        className={`chat-item ${
+                            selectedChat === room.name ? "active-chat" : ""
+                        }`}
+                        onClick={() => setSelectedChat(room.name)}
+                    >
 
-                    <div className="chat-avatar">A</div>
-                    <div className="chat-info">
-                        <h4>Ahmed</h4>
-                        <p>Hey, how are you?</p>
+                        <div className="chat-avatar">
+                            {room.name.charAt(0).toUpperCase()}
+                        </div>
+
+                        <div className="chat-info">
+                            <h4>{room.name}</h4>
+                            <p>Start chatting...</p>
+                        </div>
+
                     </div>
+                ))}
 
-                    <span className="chat-time">10:30</span>
-                </div>
-
-                <div className={`chat-item ${selectedChat === "Family" ? "active-chat" : "" }`}
-                    onClick={() => setSelectedChat("Family")} >
-
-                    <div className="chat-avatar">F</div>
-
-                    <div className="chat-info">
-                        <h4>Family</h4>
-                        <p>Good Morning?</p>
-                    </div>
-
-                    <span className="chat-time">09:15</span>
-                </div>
-
-                <div className={`chat-item ${selectedChat === "Work Group" ? "active-chat" : "" }`}
-                    onClick={() => setSelectedChat("Work Group")} >
-
-                    <div className="chat-avatar">W</div>
-                    <div className="chat-info">
-                        <h4>Work Group!</h4>
-                        <p>Meeting at 5</p>
-                    </div>
-
-                    <span className="chat-time">Yesterday</span>
-
-                </div>
             </div>
 
         </div>
