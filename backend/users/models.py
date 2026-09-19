@@ -10,4 +10,4 @@ class User(AbstractUser):
         We inherit from Django's AbstractUser so we keep  all built-in 
         authentication features while allowing future customizations.
     """
-    pass 
+    email = models.EmailField(unique=True)
