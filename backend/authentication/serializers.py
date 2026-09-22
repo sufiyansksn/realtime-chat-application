@@ -1,9 +1,43 @@
 import re
 from rest_framework import serializers
 from users.models import User
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
+
+class LoginSerializer(TokenObtainPairSerializer):
+
+    username_field = "email"
+
+    def validate(self, attrs):
+        email = attrs.get("email")
+        password = attrs.get("password")
+
+        user = User.objects.filter(email=email).first()
+
+        if not user:
+            raise serializers.ValidationError(
+                "No account found with this email"
+            )
+
+        if not user.check_password(password):
+            raise serializers.ValidationError(
+                "Incorrect password"
+            )
+
+        refresh = self.get_token(user)
+
+        return {
+            "refresh": str(refresh),
+            "access": str(refresh.access_token),
+        }
+
+    
 
 class RegisterSerializer(serializers.ModelSerializer):
+
+    confirm_password = serializers.CharField(
+        write_only = True
+    )
 
     class Meta:
         model = User
@@ -12,6 +46,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             "username",
             "email",
             "password",
+            "confirm_password"
         ]
 
         extra_kwargs = {
@@ -43,6 +78,14 @@ class RegisterSerializer(serializers.ModelSerializer):
                 "Email is already registered."
             )
         return value
+
+    def validate(self, data):
+        if data["password"] != data["confirm_password"]:
+            raise serializers.ValidationError(
+                "Passwords do not match."
+            )
+
+        return data
 
     def create(self, validated_data):
         user = User.objects.create_user(

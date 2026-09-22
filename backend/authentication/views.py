@@ -7,6 +7,12 @@ from rest_framework.permissions import IsAuthenticated
 from users.models import User
 from users.serializers import UserSerializer
 
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import LoginSerializer
+
+class LoginView(TokenObtainPairView):
+    serializer_class = LoginSerializer
+
 class MeView(APIView):
     
     permission_classes = [IsAuthenticated]
