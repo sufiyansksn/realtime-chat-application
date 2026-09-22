@@ -1,7 +1,7 @@
 import "./Sidebar.css";
 
 
-function Sidebar({ selectedChat, setSelectedChat, rooms }) {
+function Sidebar({ selectedChat, setSelectedChat, rooms, handleLogout }) {
     return (
         <div className="sidebar-content">
 
@@ -15,7 +15,10 @@ function Sidebar({ selectedChat, setSelectedChat, rooms }) {
                 </div>
 
                 <button className="settings-button">⛭</button>
+                <button onClick={handleLogout} >Logout</button>
             </div>
+
+            
 
             {/* Search bar */}
             <div className="search-box">

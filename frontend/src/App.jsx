@@ -8,6 +8,11 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  const handleLogout = () => {
+    localStorage.removeItem("access_token:");
+    setIsLoggedIn(false);
+  }
+
   useEffect(() => {
     const token = localStorage.getItem("access_token:");
 
@@ -38,7 +43,7 @@ function App() {
   }
 
   if (isLoggedIn){
-    return <ChatLayout />
+    return <ChatLayout handleLogout={handleLogout} />
   }
   
   return <Login setIsLoggedIn={setIsLoggedIn} />;

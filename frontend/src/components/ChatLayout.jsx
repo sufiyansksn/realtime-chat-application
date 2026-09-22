@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 
 import { getChatRooms } from "../services/auth";
 
-function ChatLayout() {
+function ChatLayout({ handleLogout }) {
 
     const[selectedChat, setSelectedChat] = useState("");
     const [rooms, setRooms] = useState([]);
@@ -28,6 +28,7 @@ function ChatLayout() {
                 selectedChat = {selectedChat}
                 setSelectedChat = {setSelectedChat}
                 rooms = {rooms}
+                handleLogout = {handleLogout}
             />
         </aside>
 
