@@ -6,11 +6,13 @@ import { useState, useEffect } from "react";
 function App() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem("access_token:");
 
     if (!token) {
+        setIsLoading(false);
         return;
     }
 
@@ -22,12 +24,18 @@ function App() {
         .then((response) => {
             console.log("ME response:", response.status);
 
-            if (response.ok){
-              setIsLoggedIn(true);
+            if (response.ok) {
+                setIsLoggedIn(true);
             }
-        });
 
+            setIsLoading(false);
+        });
   }, []);
+
+
+  if (isLoading){
+    return <p>Checking Authentication....</p>
+  }
 
   if (isLoggedIn){
     return <ChatLayout />
