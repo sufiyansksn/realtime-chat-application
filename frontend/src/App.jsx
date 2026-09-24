@@ -7,6 +7,22 @@ function App() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+
+  const handleThemeToggle = () => {
+    setIsDarkMode((current) => !current);
+  }
+
+  useEffect(() => {
+    if (isDarkMode){
+      document.documentElement.setAttribute("data-theme", "dark");
+    }else{
+      document.documentElement.removeAttribute("data-theme");
+    }
+  }, [isDarkMode]);
+
+  
 
   const handleLogout = () => {
     localStorage.removeItem("access_token:");
@@ -43,7 +59,10 @@ function App() {
   }
 
   if (isLoggedIn){
-    return <ChatLayout handleLogout={handleLogout} />
+    return <ChatLayout 
+      handleLogout={handleLogout} 
+      handleThemeToggle={handleThemeToggle}
+    />
   }
   
   return <Login setIsLoggedIn={setIsLoggedIn} />;

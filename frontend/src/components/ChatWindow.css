@@ -5,20 +5,16 @@
 }
 
 
-/* =========================
-   HEADER
-========================= */
+/* header */
 
 .chat-header {
   height: 75px;
   padding: 12px 20px;
-  border-bottom: 1px solid #dddddd;
-
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-
-  background: white;
+  background: var(--surface);
 }
 
 .chat-user {
@@ -30,15 +26,12 @@
 .chat-user-avatar {
   width: 45px;
   height: 45px;
-
   border-radius: 50%;
-
-  background: #d9d9d9;
-
+  background: var(--surface-secondary);
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-
   font-weight: bold;
   font-size: 18px;
 }
@@ -46,11 +39,12 @@
 .chat-user h3 {
   margin: 0;
   font-size: 16px;
+  color: var(--text-primary);
 }
 
 .chat-user span {
   font-size: 13px;
-  color: #2e9e5b;
+  color: var(--success);
 }
 
 
@@ -64,33 +58,25 @@
 .chat-actions button {
   border: none;
   background: transparent;
-
+  color: var(--text-primary);
   font-size: 18px;
-
   width: 38px;
   height: 38px;
-
   border-radius: 50%;
-
   cursor: pointer;
 }
 
 .chat-actions button:hover {
-  background: #f1f2f5;
+  background: var(--surface-secondary);
 }
 
 
-/* =========================
-   MESSAGE LIST
-========================= */
+/* messaging list */
 
 .message-list {
   flex: 1;
-
   padding: 25px;
-
   overflow-y: auto;
-
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -102,16 +88,13 @@
 .message {
   max-width: 65%;
   padding: 10px 14px;
-
   border-radius: 15px;
-
   display: flex;
   flex-direction: column;
 }
 
 .message p {
   margin: 0;
-
   font-size: 14px;
   line-height: 1.4;
 }
@@ -127,11 +110,9 @@
 
 .message.received {
   align-self: flex-start;
-
-  background: white;
-
-  border: 1px solid #e2e2e2;
-
+  background: var(--surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
   border-bottom-left-radius: 4px;
 }
 
@@ -140,47 +121,37 @@
 
 .message.sent {
   align-self: flex-end;
-
-  background: #5b6ee1;
-
+  background: var(--accent);
   color: white;
-
   border-bottom-right-radius: 4px;
 }
 
 
-/* =========================
-   INPUT
-========================= */
+/* input */
 
 .message-input-container {
   min-height: 70px;
-
   padding: 12px 18px;
-
-  border-top: 1px solid #dddddd;
-
-  background: white;
-
+  border-top: 1px solid var(--border);
+  background: var(--surface);
   display: flex;
   align-items: center;
-
   gap: 8px;
 }
 
 .message-input-container input {
   flex: 1;
-
   border: none;
   outline: none;
-
-  background: #f1f2f5;
-
+  background: var(--surface-secondary);
+  color: var(--text-primary);
   padding: 12px 16px;
-
   border-radius: 20px;
-
   font-size: 14px;
+}
+
+.message-input-container input::placeholder {
+  color: var(--text-secondary);
 }
 
 
@@ -189,9 +160,8 @@
 .input-action {
   border: none;
   background: transparent;
-
+  color: var(--text-primary);
   font-size: 18px;
-
   cursor: pointer;
 }
 
@@ -201,17 +171,11 @@
 .send-button {
   width: 42px;
   height: 42px;
-
   border: none;
-
   border-radius: 50%;
-
-  background: #5b6ee1;
-
+  background: var(--accent);
   color: white;
-
   font-size: 18px;
-
   cursor: pointer;
 }
 

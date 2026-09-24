@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 
 import { getChatRooms } from "../services/auth";
 
-function ChatLayout({ handleLogout }) {
+function ChatLayout({ handleLogout, handleThemeToggle }) {
 
     const[selectedChat, setSelectedChat] = useState("");
     const [rooms, setRooms] = useState([]);
@@ -29,6 +29,7 @@ function ChatLayout({ handleLogout }) {
                 setSelectedChat = {setSelectedChat}
                 rooms = {rooms}
                 handleLogout = {handleLogout}
+                handleThemeToggle = {handleThemeToggle}
             />
         </aside>
 

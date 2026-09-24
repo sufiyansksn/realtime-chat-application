@@ -1,7 +1,7 @@
 import "./Sidebar.css";
 
 
-function Sidebar({ selectedChat, setSelectedChat, rooms, handleLogout }) {
+function Sidebar({ selectedChat, setSelectedChat, rooms, handleLogout, handleThemeToggle }) {
     return (
         <div className="sidebar-content">
 
@@ -14,7 +14,11 @@ function Sidebar({ selectedChat, setSelectedChat, rooms, handleLogout }) {
                     <span>Online</span>
                 </div>
 
-                <button className="settings-button">⛭</button>
+                <button className="settings-button"
+                    onClick={handleThemeToggle}
+                >
+                    ⛭
+                </button>
                 <button onClick={handleLogout} >Logout</button>
             </div>
 
