@@ -40,3 +40,31 @@ class Message(models.Model):
         if self.sender:
             return f"{self.sender.username}: {self.content[:30]}"
         return f"Deleted User: {self.content[:30]}"
+
+
+class ChatRequest(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sent_chat_request")
+
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name="received_chat_request")
+
+    STATUS_CHOICES = [
+        ("PENDING", "Pending"),
+        ("ACCEPTED", "Accepted"),
+        ("DECLINED", "Declined"),
+    ]
+
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default="PEDING"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["sender", "receiver"],
+                name = "unique_chat_request",
+            )
+        ]
