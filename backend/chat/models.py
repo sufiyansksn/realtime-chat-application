@@ -56,7 +56,7 @@ class ChatRequest(models.Model):
     status = models.CharField(
         max_length=10,
         choices=STATUS_CHOICES,
-        default="PEDING"
+        default="PENDING"
     )
 
     created_at = models.DateTimeField(auto_now_add=True)

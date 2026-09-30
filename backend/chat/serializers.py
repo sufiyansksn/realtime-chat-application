@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Room, Message
+from .models import Room, Message, ChatRequest
 
 class RoomSerializer(serializers.ModelSerializer):
 
@@ -20,3 +20,9 @@ class MessageSerializer(serializers.ModelSerializer):
             "room",
             "sender",
         ]
+
+class ChatRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ChatRequest
+        fields = ["id", "receiver", "status", "created_at"]
+        read_only_fields = ["id", "status", "created_at"]
