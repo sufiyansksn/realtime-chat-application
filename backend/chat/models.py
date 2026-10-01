@@ -23,6 +23,14 @@ class RoomMembership(models.Model):
 
     joined_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["room", "user"],
+                name="unique_room_membership",
+            )
+        ]
+
     def __str__(self):
         return f"{self.user.username} -> {self.room.name}"
     

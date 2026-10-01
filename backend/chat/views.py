@@ -9,6 +9,8 @@ from rest_framework import status
 
 from .models import Room, RoomMembership, Message, ChatRequest
 from .serializers import RoomSerializer, MessageSerializer, ChatRequestSerializer
+
+from django.shortcuts import get_object_or_404
 # Create your views here.
 
 
@@ -133,9 +135,92 @@ class ChatRequestCreateView(APIView):
             status=status.HTTP_400_BAD_REQUEST
         )
 
+class ChatRequestAcceptView(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def post(self, request, request_id):
+        chat_request = get_object_or_404(
+            ChatRequest,
+            id=request_id
+        )
 
+        if chat_request.receiver != request.user:
+            return Response(
+                {"detail": "You are not allowed to accept this chat request."},
+                status=status.HTTP_403_FORBIDDEN
+            )
 
+        if chat_request.status != "PENDING":
+            return Response(
+                {"detail": "This chat request has been processed."},
+                status = status.HTTP_400_BAD_REQUEST
+            )
+
+        user1_id = min(chat_request.sender.id, chat_request.receiver.id)
+        user2_id = max(chat_request.sender.id, chat_request.receiver.id)
+        room_name = f"private_{user1_id}_{user2_id}"
+
+        room, created = Room.objects.get_or_create(
+            name = room_name,
+            defaults={
+                "created_by":request.user
+            }
+        )
+
+        RoomMembership.objects.get_or_create(
+            room=room,
+            user=chat_request.sender
+        )
+
+        RoomMembership.objects.get_or_create(
+            room=room,
+            user=chat_request.receiver
+        )
+
+        chat_request.status = "ACCEPTED"
+        chat_request.save()
+
+        return Response(
+            {
+                "detail": "Chat request accepted.",
+                "request_id": chat_request.id,
+                "status": chat_request.status,
+            },
+            status=status.HTTP_200_OK
+        )
+
+class ChatRequestDeclineView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, request_id):
+        chat_request = get_object_or_404(
+            ChatRequest,
+            id = request_id
+        )
+
+        if chat_request.receiver != request.user:
+            return Response(
+                {"detail":"You are not allowed to Decline this chat request"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        if chat_request.status != "PENDING":
+            return Response(
+                {"detail": "This chat request has been Processed"},
+                status.HTTP_400_BAD_REQUEST
+            )
+
+        chat_request.status = "DECLINED"
+        chat_request.save()
+
+        return Response(
+            {
+                "detail": "Chat request declined.",
+                "request_id": chat_request.id,
+                "status": chat_request.status,
+            },
+            status=status.HTTP_200_OK
+        )
     
 
 
