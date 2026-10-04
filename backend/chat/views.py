@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from .models import Room, RoomMembership, Message, ChatRequest
-from .serializers import RoomSerializer, MessageSerializer, ChatRequestSerializer
+from .serializers import RoomSerializer, MessageSerializer, ChatRequestSerializer, IncomingChatRequestSerializer
 
 from django.shortcuts import get_object_or_404
 # Create your views here.
@@ -185,6 +185,7 @@ class ChatRequestAcceptView(APIView):
                 "detail": "Chat request accepted.",
                 "request_id": chat_request.id,
                 "status": chat_request.status,
+                "room_id": room.id,
             },
             status=status.HTTP_200_OK
         )
@@ -221,7 +222,22 @@ class ChatRequestDeclineView(APIView):
             },
             status=status.HTTP_200_OK
         )
-    
+
+class ChatRequestListView(APIView):
+    Permissi_classes = [IsAuthenticated]
+
+    def get(self, request):
+        requests = ChatRequest.objects.filter(
+            receiver = request.user,
+            status = "PENDING"
+        )
+
+        serializer = IncomingChatRequestSerializer(
+            requests,
+            many=True
+        )
+
+        return Response (serializer.data)
 
 
 # class RoomCreateView(CreateAPIView):

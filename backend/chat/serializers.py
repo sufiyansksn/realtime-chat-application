@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Room, Message, ChatRequest
+from users.serializers import UserSearchSerializer
 
 class RoomSerializer(serializers.ModelSerializer):
 
@@ -26,3 +27,10 @@ class ChatRequestSerializer(serializers.ModelSerializer):
         model = ChatRequest
         fields = ["id", "receiver", "status", "created_at"]
         read_only_fields = ["id", "status", "created_at"]
+
+class IncomingChatRequestSerializer(serializers.ModelSerializer):
+    sender = UserSearchSerializer(read_only=True)
+
+    class Meta:
+        model = ChatRequest
+        fields = ["id", "sender", "status", "created_at"]
