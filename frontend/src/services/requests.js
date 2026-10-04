@@ -16,3 +16,20 @@ export const getChatRequests = async () => {
 
     return response.data;
 };
+
+
+export const acceptChatRequest = async (requesId) => {
+    const token = localStorage.getItem("access_token:");
+
+    const response = await axios.post(
+        `${API_URL}/request/${requesId}/accept/`,
+        {},
+        {
+            headers:{
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    return response.data;
+}

@@ -1,7 +1,7 @@
 import "./Sidebar.css";
 import { useState, useEffect } from "react";
 import { searchUsers } from "../services/users";
-import { getChatRequests } from "../services/requests";
+import { getChatRequests, acceptChatRequest } from "../services/requests";
 
 function Sidebar({
     selectedChat,
@@ -50,6 +50,15 @@ function Sidebar({
 
     const handleRequests = () => {
         setShowRequests((previous) => !previous);
+    };
+
+    const handleAccept = async (requestId) => {
+        try{
+            const response = await acceptChatRequest(requestId);
+            console.log("Chat request accepted:", response);
+        }catch(error){
+            console.log("Failed to accept the request:", error);
+        }
     };
 
     return (
@@ -215,7 +224,9 @@ function Sidebar({
 
                                     <div className="request-actions">
 
-                                        <button className="accept-button">
+                                        <button className="accept-button"
+                                                onClick={() => handleAccept(request.id)}
+                                        >
                                             Accept
                                         </button>
 
