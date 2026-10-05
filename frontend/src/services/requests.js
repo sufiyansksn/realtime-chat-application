@@ -33,3 +33,20 @@ export const acceptChatRequest = async (requesId) => {
 
     return response.data;
 }
+
+
+export const declineChatRequest = async (requestId) => {
+    const token = localStorage.getItem("access_token:");
+
+    const response = await axios.post(
+        `${API_URL}/request/${requestId}/decline/`,
+        {},
+        {
+            headers:{
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    return response.data;
+}

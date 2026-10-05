@@ -1,14 +1,15 @@
 import "./Sidebar.css";
 import { useState, useEffect } from "react";
 import { searchUsers } from "../services/users";
-import { getChatRequests, acceptChatRequest } from "../services/requests";
+import { getChatRequests, acceptChatRequest, declineChatRequest } from "../services/requests";
 
 function Sidebar({
     selectedChat,
     setSelectedChat,
     rooms,
     handleLogout,
-    handleThemeToggle
+    handleThemeToggle,
+    loadRooms
 }) {
 
     const [searchQuery, setSearchQuery] = useState("");
@@ -16,6 +17,7 @@ function Sidebar({
 
     const [showRequests, setShowRequests] = useState(false);
     const [chatRequests, setChatRequests] = useState([]);
+
 
     useEffect(() => {
         const loadChatRequests = async () => {
@@ -56,10 +58,32 @@ function Sidebar({
         try{
             const response = await acceptChatRequest(requestId);
             console.log("Chat request accepted:", response);
+
+            setChatRequests((previousRequests) =>
+                previousRequests.filter((request) => request.id !== requestId
+                )
+            );
+
+            loadRooms();
         }catch(error){
             console.log("Failed to accept the request:", error);
         }
     };
+
+
+    const handleDecline = async (requestId) => {
+        try{
+            const response = await declineChatRequest(requestId);
+            console.log("Chat request declined:", response)
+
+            setChatRequests((previousRequests) => 
+                previousRequests.filter((request) => request.id != requestId)
+            );
+        
+        }catch(error) {
+            console.log("Failed to decline the request:", error)
+        }
+    }
 
     return (
         <div className="sidebar-content">
@@ -225,12 +249,14 @@ function Sidebar({
                                     <div className="request-actions">
 
                                         <button className="accept-button"
-                                                onClick={() => handleAccept(request.id)}
+                                            onClick={() => handleAccept(request.id)}
                                         >
                                             Accept
                                         </button>
 
-                                        <button className="decline-button">
+                                        <button className="decline-button"
+                                            onClick={() => handleDecline(request.id)}
+                                        >
                                             Decline
                                         </button>
 

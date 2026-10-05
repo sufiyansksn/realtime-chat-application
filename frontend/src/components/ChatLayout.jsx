@@ -10,13 +10,16 @@ function ChatLayout({ handleLogout, handleThemeToggle }) {
     const[selectedChat, setSelectedChat] = useState("");
     const [rooms, setRooms] = useState([]);
 
-    useEffect(() => {
+    const loadRooms = () => {
         getChatRooms().then((rooms) => {
             setRooms(rooms)
         })
         .catch((error) => {
             console.error("getChatrooms error:", error);
         });
+    };
+    useEffect(() => {
+        loadRooms();    
     },[]);
 
     return (
@@ -28,6 +31,7 @@ function ChatLayout({ handleLogout, handleThemeToggle }) {
                 selectedChat = {selectedChat}
                 setSelectedChat = {setSelectedChat}
                 rooms = {rooms}
+                loadRooms = {loadRooms}
                 handleLogout = {handleLogout}
                 handleThemeToggle = {handleThemeToggle}
             />
