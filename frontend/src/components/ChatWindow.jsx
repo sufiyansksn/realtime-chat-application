@@ -6,11 +6,15 @@ import { getCurrentUser, getMessages } from "../services/auth";
 
 function ChatWindow({ selectedChat, rooms }) {
 
-    const selectedRoom = rooms.find(
-        (room) => room.name === selectedChat
-    );
+    const selectedRoom = rooms.find((room) => room.name === selectedChat);
 
     const roomId = selectedRoom?.id;
+
+    const otherUser = selectedRoom?.other_user;
+
+    const displayName = 
+    `${otherUser?.first_name || ""} ${otherUser?.last_name || ""}`.trim()
+    || otherUser?.username || "";
 
     const [messageText, setMessageText] = useState("");
     const [messages, setMessages] = useState([]);
@@ -121,11 +125,11 @@ function ChatWindow({ selectedChat, rooms }) {
             <header className="chat-header">
 
                 <div className="chat-user">
-                    <div className="chat-user-avatar">A</div>
+                    <div className="chat-user-avatar">{displayName.charAt(0).toUpperCase()}</div>
 
                     <div>
-                        <h3>{selectedChat}</h3>
-                        <span>Online</span>
+                        <h3>{displayName}</h3>
+                        <span>@{otherUser?.username}</span>
                     </div>
                 </div>
 
