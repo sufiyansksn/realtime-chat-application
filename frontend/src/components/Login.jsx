@@ -5,9 +5,13 @@ function Login({ setIsLoggedIn, setShowRegister }) {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+
+        {/* it clears any previous erros if we have */}
+        setError("");
 
         const loginData = {
             email,
@@ -31,6 +35,10 @@ function Login({ setIsLoggedIn, setShowRegister }) {
         if (response.ok){
             localStorage.setItem("access_token:", data.access);
             setIsLoggedIn(true);
+        }else{
+            const firstError = Object.values(data).flat() [0] || "Login failed";
+
+            setError(firstError)
         }
     };
 
@@ -40,14 +48,15 @@ function Login({ setIsLoggedIn, setShowRegister }) {
             <div className="login-container">
 
                 <div className="login-heading">
-
                     <h1>Welcome back!</h1>
-
-                    <p>
-                        Sign in to your account to continue
-                    </p>
-
+                    <p>Sign in to your account to continue</p>
                 </div>
+
+                {error && (
+                    <p className="login-error">
+                        {error}
+                    </p>
+                )}
 
                 <form
                     className="login-form"
