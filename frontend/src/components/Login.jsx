@@ -1,6 +1,7 @@
 import { useState } from "react";
+import "./Login.css"
 
-function Login({ setIsLoggedIn }) {
+function Login({ setIsLoggedIn, setShowRegister }) {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -34,39 +35,83 @@ function Login({ setIsLoggedIn }) {
     };
 
     return (
-        <div className="login-container">
+        <div className="login-page">
 
-            <h1>Login</h1>
+            <div className="login-container">
 
-            <form onSubmit={handleSubmit}>
+                <div className="login-heading">
 
-                <div>
-                    <label>Email</label>
+                    <h1>Welcome back!</h1>
 
-                    <input
-                        type="email"
-                        placeholder="Enter your email"
-                        value={email}
-                        onChange={(event) => setEmail(event.target.value)}
-                    />
+                    <p>
+                        Sign in to your account to continue
+                    </p>
+
                 </div>
 
-                <div>
-                    <label>Password</label>
+                <form
+                    className="login-form"
+                    onSubmit={handleSubmit}
+                >
 
-                    <input
-                        type="password"
-                        placeholder="Enter your password"
-                        value={password}
-                        onChange={(event) => setPassword(event.target.value)}
-                    />
+                    <div className="login-input-group">
+
+                        <input
+                            type="email"
+                            placeholder="Email Address"
+                            value={email}
+                            onChange={(event) =>
+                                setEmail(event.target.value)
+                            }
+                        />
+
+                    </div>
+
+                    <div className="login-input-group">
+
+                        <input
+                            type="password"
+                            placeholder="Password"
+                            value={password}
+                            onChange={(event) =>
+                                setPassword(event.target.value)
+                            }
+                        />
+
+                    </div>
+
+                    <div className="forgot-password">
+
+                        <button type="button">
+                            Forgot password?
+                        </button>
+
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="login-button"
+                    >
+                        Sign In
+                    </button>
+
+                </form>
+
+                <div className="login-register-link">
+
+                    <span>
+                        Don't have an account?{" "}
+                    </span>
+
+                    <button type="button"
+                        onClick={() => setShowRegister(true)}
+                    >
+                        Sign Up
+                    </button>
+
                 </div>
 
-                <button type="submit">
-                    Login
-                </button>
-
-            </form>
+            </div>
 
         </div>
     );

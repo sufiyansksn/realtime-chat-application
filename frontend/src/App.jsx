@@ -9,6 +9,8 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
+  const [showRegister, setShowRegister] = useState(false);
+
 
   const handleThemeToggle = () => {
     setIsDarkMode((current) => !current);
@@ -65,7 +67,13 @@ function App() {
     />
   }
   
-  return <Login setIsLoggedIn={setIsLoggedIn} />;
+  {/* This is Ternary operatopr. this is for remmebering heading for me. */}
+  return showRegister ? (
+    <Register setShowRegister={setShowRegister} />
+  ) : (
+    <Login setShowRegister={setShowRegister} setIsLoggedIn={setIsLoggedIn} />
+  );
+  
 }
 
 export default App;

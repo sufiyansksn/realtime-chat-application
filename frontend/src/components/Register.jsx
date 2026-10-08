@@ -1,18 +1,24 @@
 import { useState } from "react";
+import "./Register.css";
 
-function Register(){
+function Register({setShowRegister}){
     
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("")
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
     const [message, setMessage] = useState("")
     const [error, setError] = useState("")
+    
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         
         const registrationData = {
+            first_name: firstName,
+            last_name: lastName,
             email,
             username,
             password,
@@ -40,6 +46,8 @@ function Register(){
             setMessage("Account created successfully!");
             setError("");
 
+            setFirstName("");
+            setLastName("");
             setEmail("");
             setUsername("");
             setPassword("");
@@ -57,59 +65,147 @@ function Register(){
     };
 
     return (
-        <div className="register-container">
-            {message && <p>{message}</p>}
-            {error && <p>{error}</p>}
+        <div className="register-page">
 
-            <h1>Create an Account</h1>
+            <div className="register-container">
 
-            <form onSubmit ={handleSubmit} >
+                {/* Sign Up / Log In toggle */}
+                <div className="auth-toggle">
 
-                <div>
-                    <label>Email</label>
-                    <input 
-                        type="email" 
-                        placeholder="Enter your email"
-                        value = {email}
-                        onChange = {(event) => setEmail(event.target.value)}
-                    />
+                    <button className="active">
+                        Sign Up
+                    </button>
+
+                    <button 
+                        type="button"
+                        onClick={() => setShowRegister(false)}
+                    >
+                        Log In
+                    </button>
+
                 </div>
 
-                <div>
-                    <label>Username</label>
-                    <input 
-                        type="text" 
-                        placeholder="Choose a username" 
-                        value = {username}
-                        onChange = {(event) => setUsername(event.target.value)}
-                    />
+                {/* Heading */}
+                <div className="register-heading">
+
+                    <h1>Create An Account</h1>
+
+                    <p>Create your account to start chatting.</p>
+
                 </div>
 
-                <div>
-                    <label>Password</label>
-                    <input 
-                        type="password" 
-                        placeholder="Create a Password" 
-                        value = {password}
-                        onChange = {(event) => setPassword(event.target.value)}
-                    />
-                </div>
+                {/* Messages */}
+                {message && (
+                    <p className="success-message">
+                        {message}
+                    </p>
+                )}
 
-                <div>
-                    <label>Confirm Password</label>
-                    <input 
-                        type="password" 
-                        placeholder="Confirm Password" 
-                        value = {confirmPassword}
-                        onChange = {(event) => setConfirmPassword(event.target.value)}
-                    />
-                </div>
+                {error && (
+                    <p className="error-message">
+                        {error}
+                    </p>
+                )}
 
-                <button type="submit">
-                    Create Account
-                </button>
+                {/* Registration form */}
+                <form
+                    className="register-form"
+                    onSubmit={handleSubmit}
+                >
 
-            </form>
+                    {/* First + Last name */}
+                    <div className="name-row">
+
+                        <div className="input-group">
+                            <input
+                                type="text"
+                                placeholder="First Name"
+                                value={firstName}
+                                onChange={(event) =>
+                                    setFirstName(event.target.value)
+                                }
+                            />
+                        </div>
+
+                        <div className="input-group">
+                            <input
+                                type="text"
+                                placeholder="Last Name"
+                                value={lastName}
+                                onChange={(event) =>
+                                    setLastName(event.target.value)
+                                }
+                            />
+                        </div>
+
+                    </div>
+
+                    {/* Username */}
+                    <div className="input-group">
+
+                        <input
+                            type="text"
+                            placeholder="Username"
+                            value={username}
+                            onChange={(event) =>
+                                setUsername(event.target.value)
+                            }
+                        />
+
+                    </div>
+
+                    {/* Email */}
+                    <div className="input-group">
+
+                        <input
+                            type="email"
+                            placeholder="Enter Your Email"
+                            value={email}
+                            onChange={(event) =>
+                                setEmail(event.target.value)
+                            }
+                        />
+
+                    </div>
+
+                    {/* Password */}
+                    <div className="input-group">
+
+                        <input
+                            type="password"
+                            placeholder="Password"
+                            value={password}
+                            onChange={(event) =>
+                                setPassword(event.target.value)
+                            }
+                        />
+
+                    </div>
+
+                    {/* Confirm Password */}
+                    <div className="input-group">
+
+                        <input
+                            type="password"
+                            placeholder="Confirm Password"
+                            value={confirmPassword}
+                            onChange={(event) =>
+                                setConfirmPassword(event.target.value)
+                            }
+                        />
+
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="register-button"
+                    >
+                        Create an Account
+                    </button>
+
+                </form>
+
+            </div>
 
         </div>
     );
