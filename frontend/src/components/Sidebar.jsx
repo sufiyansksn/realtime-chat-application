@@ -277,44 +277,42 @@ function Sidebar({
             {/* Chats List */}
             <div className="chat-list">
 
-                {rooms.map((room) => (
+                {rooms.map((room) => {
 
-                    <div
-                        key={room.id}
-                        className={`chat-item ${
-                            selectedChat === room.name
-                                ? "active-chat"
-                                : ""
-                        }`}
-                        onClick={() =>
-                            setSelectedChat(room.name)
-                        }
-                    >
+                    const displayName =
+                        `${room.other_user.first_name} ${room.other_user.last_name}`.trim()
+                        || room.other_user.username;
 
-                        <div className="chat-avatar">
-                            {room.name
-                                .charAt(0)
-                                .toUpperCase()}
+                    return (
+                        <div
+                            key={room.id}
+                            className={`chat-item ${selectedChat === room.name ? "active-chat": "" }`}
+                            onClick={() =>
+                                setSelectedChat(room.name)
+                            }
+                        >
+
+                            <div className="chat-avatar">
+                                {displayName.charAt(0).toUpperCase()}
+                            </div>
+
+                            <div className="chat-info">
+
+                                <h4>
+                                    {displayName}
+                                </h4>
+
+                                <p>
+                                    @{room.other_user.username}
+                                </p>
+
+                            </div>
+
                         </div>
-
-                        <div className="chat-info">
-
-                            <h4>
-                                {room.name}
-                            </h4>
-
-                            <p>
-                                Start chatting...
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                ))}
+                    );
+                })}
 
             </div>
-
         </div>
     );
 }
