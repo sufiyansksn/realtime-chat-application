@@ -1,92 +1,106 @@
 import "./ChatWindow.css";
 import { useState, useEffect, useRef } from "react";
 import { createWebSocket } from "../services/websocket";
-import { getCurrentUser } from "../services/auth";
+import { getCurrentUser, getMessages } from "../services/auth";
 
 
-const chatRooms = {
-    Ahmed: 6,
-    Family: 7,
-    "Work Group": 8,
-};
+function ChatWindow({ selectedChat, rooms }) {
 
+    const selectedRoom = rooms.find(
+        (room) => room.name === selectedChat
+    );
 
-
-function ChatWindow({ selectedChat, rooms }){
-
-
-    //websocket connections 
-    const selectedRoom = rooms.find((room) => room.name === selectedChat);
-    
     const roomId = selectedRoom?.id;
 
     const [messageText, setMessageText] = useState("");
     const [messages, setMessages] = useState([]);
-
-    const messagesEndRef = useRef(null);
-    const socketRef = useRef(null)
-
     const [currentUser, setCurrentUser] = useState(null);
 
+    const messagesEndRef = useRef(null);
+    const socketRef = useRef(null);
+
 
     useEffect(() => {
-        getCurrentUser().then((user) => {
-            console.log("CurrentUser:", user)
-            setCurrentUser(user)
-        }) 
-        .catch((error) => {
-            console.error("getCurrentUser ERROR:", error);
-        });
+        getCurrentUser()
+            .then((user) => {
+                setCurrentUser(user);
+            })
+            .catch((error) => {
+                console.error("getCurrentUser ERROR:", error);
+            });
     }, []);
 
+
     useEffect(() => {
-        
-        if ( !currentUser || !roomId ){
+        if (!roomId) {
             return;
         }
 
-        setMessages([]);
+        getMessages(roomId)
+            .then((data) => {
+
+                const formattedMessages = data.map((message) => ({
+                    id: message.id,
+                    type: message.sender === currentUser?.id ? "sent" : "received",
+                    content: message.content,
+                    time: new Date(message.created_at).toLocaleTimeString([], {hour: "2-digit", minute: "2-digit",}),
+                }));
+
+                setMessages(formattedMessages);
+            })
+            .catch((error) => {
+                console.error(
+                    "Failed to load message history:",
+                    error
+                );
+            });
+
+    }, [roomId, currentUser]);
+
+
+    useEffect(() => {
+        if (!currentUser || !roomId) {
+            return;
+        }
 
         const socket = createWebSocket(roomId);
 
         socketRef.current = socket;
 
-        //When the connection actually becomes OPEN, execute this function.
         socket.onopen = () => {
-            console.log("Websocket Connected!")
-        }
+            console.log("Websocket Connected!");
+        };
 
         socket.onmessage = (event) => {
-            const message = JSON.parse(event.data)
+            const message = JSON.parse(event.data);
 
             const formattedMessage = {
                 id: message.id,
                 type: message.sender === currentUser.id ? "sent" : "received",
                 content: message.content,
-                time: new Date(message.created_at).toLocaleTimeString([],{ hour: "2-digit", minute: "2-digit",}),
-            }   
+                time: new Date(
+                    message.created_at
+                ).toLocaleTimeString([], {hour: "2-digit",minute: "2-digit", }),
+            };
 
             setMessages((previousMessages) => [
                 ...previousMessages,
                 formattedMessage,
             ]);
+        };
 
-            //console.log("Message from server:", message)
-        }
-        // stops old websocket connection.
         return () => {
             socket.close();
         };
 
     }, [roomId, currentUser]);
 
-    
+
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({
             behavior: "smooth",
         });
-    },[messages])
-
+    }, [messages]);
 
 
     const handleSend = () => {
@@ -97,7 +111,8 @@ function ChatWindow({ selectedChat, rooms }){
         socketRef.current.send(messageText);
 
         setMessageText("");
-    }
+    };
+
 
     return (
         <div className="chat-window-content">
@@ -107,6 +122,7 @@ function ChatWindow({ selectedChat, rooms }){
 
                 <div className="chat-user">
                     <div className="chat-user-avatar">A</div>
+
                     <div>
                         <h3>{selectedChat}</h3>
                         <span>Online</span>
@@ -121,8 +137,10 @@ function ChatWindow({ selectedChat, rooms }){
 
             </header>
 
+
             {/* Messages */}
             <div className="message-list">
+
                 {messages.map((message) => (
                     <div
                         key={message.id}
@@ -132,9 +150,11 @@ function ChatWindow({ selectedChat, rooms }){
                         <span>{message.time}</span>
                     </div>
                 ))}
+
                 <div ref={messagesEndRef}></div>
 
             </div>
+
 
             {/* Message Input */}
             <div className="message-input-container">
@@ -146,8 +166,10 @@ function ChatWindow({ selectedChat, rooms }){
                 <input
                     type="text"
                     placeholder="Type a message..."
-                    value = {messageText}
-                    onChange = {(event) => setMessageText(event.target.value)}
+                    value={messageText}
+                    onChange={(event) =>
+                        setMessageText(event.target.value)
+                    }
                     onKeyDown={(event) => {
                         if (event.key === "Enter") {
                             handleSend();
@@ -155,12 +177,15 @@ function ChatWindow({ selectedChat, rooms }){
                     }}
                 />
 
-                <button 
+                <button
                     className="send-button"
-                    onClick = {handleSend}
-                >➤</button>
+                    onClick={handleSend}
+                >
+                    ➤
+                </button>
 
             </div>
+
         </div>
     );
 }

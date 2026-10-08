@@ -32,3 +32,20 @@ export async function getChatRooms() {
 
     return data;
 }
+
+export async function getMessages(roomId){
+    const token = localStorage.getItem("access_token:")
+
+    const response = await fetch(
+        `http://127.0.0.1:8000/api/chat/rooms/${roomId}/messages/`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    const data = await response.json();
+
+    return data;
+}
