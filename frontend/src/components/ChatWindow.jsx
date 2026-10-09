@@ -6,7 +6,7 @@ import { getCurrentUser, getMessages } from "../services/auth";
 
 function ChatWindow({ selectedChat, rooms }) {
 
-    const selectedRoom = rooms.find((room) => room.name === selectedChat);
+    const selectedRoom = rooms.find((room) => room.id === selectedChat);
 
     const roomId = selectedRoom?.id;
 

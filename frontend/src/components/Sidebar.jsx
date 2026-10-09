@@ -286,10 +286,8 @@ function Sidebar({
                     return (
                         <div
                             key={room.id}
-                            className={`chat-item ${selectedChat === room.name ? "active-chat": "" }`}
-                            onClick={() =>
-                                setSelectedChat(room.name)
-                            }
+                            className={`chat-item ${selectedChat === room.id ? "active-chat": "" }`}
+                            onClick={() => setSelectedChat(room.id)}
                         >
 
                             <div className="chat-avatar">
