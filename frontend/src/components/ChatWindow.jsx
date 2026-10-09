@@ -112,8 +112,16 @@ function ChatWindow({ selectedChat, rooms }) {
             return;
         }
 
+        //Checking the websocket exists and disconencted.
+        if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN){
+            console.log("Websocket is not connected. Message not sent.");
+            return;
+        }
+
+        //in this line iam sending Message through the websocket.
         socketRef.current.send(messageText);
 
+        //Clearing the input after sending.
         setMessageText("");
     };
 
