@@ -20,6 +20,8 @@ function ChatWindow({ selectedChat, rooms }) {
     const [messages, setMessages] = useState([]);
     const [currentUser, setCurrentUser] = useState(null);
 
+    const [connectionStatus, setConnectionStatus] = useState(null);
+
     const messagesEndRef = useRef(null);
     const socketRef = useRef(null);
 
@@ -67,13 +69,30 @@ function ChatWindow({ selectedChat, rooms }) {
             return;
         }
 
+
+        
+        setConnectionStatus("connecting");
+
         const socket = createWebSocket(roomId);
 
         socketRef.current = socket;
 
         socket.onopen = () => {
-            console.log("Websocket Connected!");
+            console.log("WebSocket Connected!");
+            setConnectionStatus("connected");
         };
+
+        socket.onclose = () => {
+            console.log("WebSocket Disconnected!");
+            setConnectionStatus("disconnected");
+        };
+
+        socket.onerror = (error) => {
+            console.error("WebSocket Error:", error);
+            setConnectionStatus("disconnected");
+        };
+
+
 
         socket.onmessage = (event) => {
             const message = JSON.parse(event.data);
