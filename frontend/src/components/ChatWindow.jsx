@@ -24,6 +24,9 @@ function ChatWindow({ selectedChat, rooms }) {
 
     const messagesEndRef = useRef(null);
     const socketRef = useRef(null);
+    const reconnectTimerRef = useRef(null);
+
+    const connectionTimeRef = useRef(null);
 
 
     useEffect(() => {
@@ -64,59 +67,76 @@ function ChatWindow({ selectedChat, rooms }) {
     }, [roomId, currentUser]);
 
 
+
+    //websocket useEffect
     useEffect(() => {
         if (!currentUser || !roomId) {
             return;
         }
 
+        let shouldReconnect = true;
 
-        
-        setConnectionStatus("connecting");
+        const connectSocket = () => {
+            setConnectionStatus("connecting");
 
-        const socket = createWebSocket(roomId);
+            const socket = createWebSocket(roomId);
 
-        socketRef.current = socket;
+            socketRef.current = socket;
 
-        socket.onopen = () => {
-            console.log("WebSocket Connected!");
-            setConnectionStatus("connected");
-        };
-
-        socket.onclose = () => {
-            console.log("WebSocket Disconnected!");
-            setConnectionStatus("disconnected");
-        };
-
-        socket.onerror = (error) => {
-            console.error("WebSocket Error:", error);
-            setConnectionStatus("disconnected");
-        };
-
-
-
-        socket.onmessage = (event) => {
-            const message = JSON.parse(event.data);
-
-            const formattedMessage = {
-                id: message.id,
-                type: message.sender === currentUser.id ? "sent" : "received",
-                content: message.content,
-                time: new Date(
-                    message.created_at
-                ).toLocaleTimeString([], {hour: "2-digit",minute: "2-digit", }),
+            socket.onopen = () => {
+                console.log("WebSocket Connected!");
+                setConnectionStatus("connected");
             };
 
-            setMessages((previousMessages) => [
-                ...previousMessages,
-                formattedMessage,
-            ]);
+            socket.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+
+                const formattedMessage = {
+                    id: message.id,
+                    type: message.sender === currentUser.id ? "sent" : "received",
+                    content: message.content,
+                    time: new Date(message.created_at).toLocaleTimeString([], {hour: "2-digit", minute: "2-digit",}),
+                };
+
+                setMessages((previousMessages) => [
+                    ...previousMessages,
+                    formattedMessage,
+                ]);
+            };
+
+            socket.onclose = () => {
+                console.log("WebSocket Disconnected!");
+                setConnectionStatus("disconnected");
+
+                if (shouldReconnect) {
+                    reconnectTimerRef.current = setTimeout(() => {
+                        connectSocket();
+                    }, 2000);
+                }
+            };
+
+            socket.onerror = (error) => {
+                console.error("WebSocket Error:", error);
+                setConnectionStatus("disconnected");
+            };
         };
+
+        connectSocket();
 
         return () => {
-            socket.close();
-        };
+            // Preventing reconnecting after switching chats or unmounting.
+            shouldReconnect = false;
 
+            // Canceling a pending reconnect timer.
+            clearTimeout(reconnectTimerRef.current);
+
+            // Closing the current connection.
+            socketRef.current?.close();
+
+            socketRef.current = null;
+        };
     }, [roomId, currentUser]);
+
 
 
     useEffect(() => {
