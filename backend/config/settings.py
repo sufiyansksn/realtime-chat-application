@@ -152,11 +152,23 @@ SIMPLE_JWT = {
     "UPDATE_LAST_LOGIN": True,
 }
 
+
+
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
-    }
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [
+                {
+                    "address": "redis://127.0.0.1:6379",
+                    "socket_timeout": None,
+                }
+            ],
+        },
+    },
 }
+
+
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
