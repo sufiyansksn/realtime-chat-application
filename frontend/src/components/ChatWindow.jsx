@@ -222,9 +222,7 @@ function ChatWindow({ selectedChat, rooms }) {
                         setMessageText(event.target.value)
                     }
                     onKeyDown={(event) => {
-                        if (event.key === "Enter") {
-                            handleSend();
-                        }
+                        if (event.key === "Enter") { handleSend();}
                     }}
                 />
 

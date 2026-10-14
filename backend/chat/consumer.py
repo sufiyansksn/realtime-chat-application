@@ -7,6 +7,25 @@ from users.models import User
 from .models import Room, RoomMembership, Message
 from channels.db import database_sync_to_async
 
+import redis
+
+redis_client = redis.Redis(
+    host="127.0.0.1",
+    port=6379,
+    decode_responses=True,
+)
+
+def add_user_connection(user_id,channel_name):
+    key = f"presence:user:{user_id}:connections"
+    redis_client.sadd(key, channel_name)
+
+def remove_user_connection(user_id, channel_name):
+    key = f"presence:user:{user_id}:connections"
+    redis_client.srem(key, channel_name)
+
+
+
+
 
 @database_sync_to_async
 def is_room_member(room_id, user):
@@ -42,12 +61,36 @@ class ChatConsumer(WebsocketConsumer):
         )
         self.accept() #giving permission. The browser will fail to establish the WebSocket
 
+        self.user_id = self.scope["user"].id
+        self.connection_name = self.channel_name
+
+        add_user_connection(self.user_id, self.connection_name)
+
+        print("Presence connection added:", self.user_id, self.connection_name)
+
         print("Connected")
         print("Room ID:", self.room_id)
         print("Group:", self.room_group_name)
         print(self.scope["user"])
 
-        
+
+    def disconnect(self, close_code):
+        async_to_sync(self.channel_layer.group_discard)( #group_discard() removes this connection from the room group.
+            self.room_group_name,
+            self.channel_name,
+        )
+
+        if hasattr(self, "user_id"):
+            remove_user_connection(
+                self.user_id,
+                self.connection_name,
+            )
+            print("Presence connection removed:", self.user_id, self.connection_name)
+
+        print("Disconnected")
+        print("Room ID:", self.room_id)
+        print("Close Code:", close_code)
+
 
     def receive(self, text_data): #receive method is called when the client sends a message.
         print("Message Received", text_data) #text_data is acarrying the message.
