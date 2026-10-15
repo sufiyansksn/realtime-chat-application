@@ -131,3 +131,49 @@ class ChatConsumer(WebsocketConsumer):
 
         
 
+
+class PresenceConsumer(WebsocketConsumer):
+    def connect(self):
+        self.user = self.scope["user"]
+
+        if not self.user.is_authenticated:
+            self.close(code=4003)
+            return
+
+        self.presence_group_name = f"presence_user_{self.user.id}"
+
+        async_to_sync(self.channel_layer.group_add)(
+            self.presence_group_name,
+            self.channel_name,
+        )
+
+        self.accept()
+
+        self.user_id = self.user.id
+        self.connection_name = self.channel_name
+
+        add_user_connection(self.user_id, self.connection_name)
+
+        print("Presence Websocket Connected:", self.user.id)
+        print("Presence Connection Added:", self.user_id, self.connection_name)
+        print("Active connections:",redis_client.scard(f"presence:user:{self.user_id}:connections"),)
+
+    
+    def disconnect(self, close_code):
+        print("Presence disconnect called:", close_code)
+
+        if hasattr(self, "presence_group_name"):
+            async_to_sync(self.channel_layer.group_discard)(
+                self.presence_group_name,
+                self.channel_name,
+            )
+
+        if hasattr(self, "user_id"):
+            remove_user_connection(self.user_id, self.connection_name)
+
+            print("Presence connection removed:",self.user_id, self.connection_name,)
+            print("Active connections:",redis_client.scard(f"presence:user:{self.user_id}:connections"),)
+
+
+    def presence_update(self, event):
+        self.send(text_data=json.dumps(event["data"]))
