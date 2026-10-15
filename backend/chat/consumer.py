@@ -152,7 +152,14 @@ class PresenceConsumer(WebsocketConsumer):
         self.user_id = self.user.id
         self.connection_name = self.channel_name
 
+        connections_before = redis_client.scard(f"presence:user:{self.user_id}:connections")
+
         add_user_connection(self.user_id, self.connection_name)
+
+        connections_after = redis_client.scard(f"presence:user:{self.user_id}:connections")
+
+        if connections_before == 0 and connections_after > 0:
+            print("User became ONLINE:", self.user_id)
 
         print("Presence Websocket Connected:", self.user.id)
         print("Presence Connection Added:", self.user_id, self.connection_name)
@@ -170,6 +177,10 @@ class PresenceConsumer(WebsocketConsumer):
 
         if hasattr(self, "user_id"):
             remove_user_connection(self.user_id, self.connection_name)
+
+            connection_after = redis_client.scard(f"presence:user:{self.user_id}:connections")
+            if connection_after == 0:
+                print("User becomed OFFLINE:", self.user_id)
 
             print("Presence connection removed:",self.user_id, self.connection_name,)
             print("Active connections:",redis_client.scard(f"presence:user:{self.user_id}:connections"),)
