@@ -24,7 +24,9 @@ def remove_user_connection(user_id, channel_name):
     redis_client.srem(key, channel_name)
 
 
-
+def is_user_online(user_id):
+    key = f"presence:user:{user_id}:connections"
+    return redis_client.scard(key) > 0      
 
 
 @database_sync_to_async
