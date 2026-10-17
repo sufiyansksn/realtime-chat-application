@@ -26,7 +26,26 @@ def remove_user_connection(user_id, channel_name):
 
 def is_user_online(user_id):
     key = f"presence:user:{user_id}:connections"
-    return redis_client.scard(key) > 0      
+    return redis_client.scard(key) > 0   
+
+
+
+@database_sync_to_async
+def get_accepted_contacts_ids(user_id):
+    from .models import ChatRequest
+
+    sent_requests = ChatRequest.objects.filter(
+        sender_id=user_id, 
+        status="ACCEPTED",
+    ).values_list("receiver_id", flat=True)
+
+    received_requests = ChatRequest.objects.filter(
+        receiver_id=user_id,
+        status="ACCEPTED",
+    ).values_list("sender_id", flat=True)
+
+    return list(set(sent_requests) | set(received_requests))
+
 
 
 @database_sync_to_async
@@ -63,13 +82,7 @@ class ChatConsumer(WebsocketConsumer):
         )
         self.accept() #giving permission. The browser will fail to establish the WebSocket
 
-        self.user_id = self.scope["user"].id
-        self.connection_name = self.channel_name
-
-        add_user_connection(self.user_id, self.connection_name)
-
-        print("Presence connection added:", self.user_id, self.connection_name)
-
+        
         print("Connected")
         print("Room ID:", self.room_id)
         print("Group:", self.room_group_name)
@@ -82,12 +95,6 @@ class ChatConsumer(WebsocketConsumer):
             self.channel_name,
         )
 
-        if hasattr(self, "user_id"):
-            remove_user_connection(
-                self.user_id,
-                self.connection_name,
-            )
-            print("Presence connection removed:", self.user_id, self.connection_name)
 
         print("Disconnected")
         print("Room ID:", self.room_id)
@@ -160,6 +167,7 @@ class PresenceConsumer(WebsocketConsumer):
 
         if connections_before == 0 and connections_after > 0:
             print("User became ONLINE:", self.user_id)
+            self.broadcast_presence("online")
 
         print("Presence Websocket Connected:", self.user.id)
         print("Presence Connection Added:", self.user_id, self.connection_name)
@@ -181,6 +189,7 @@ class PresenceConsumer(WebsocketConsumer):
             connection_after = redis_client.scard(f"presence:user:{self.user_id}:connections")
             if connection_after == 0:
                 print("User becomed OFFLINE:", self.user_id)
+                self.broadcast_presence("offline")
 
             print("Presence connection removed:",self.user_id, self.connection_name,)
             print("Active connections:",redis_client.scard(f"presence:user:{self.user_id}:connections"),)
@@ -188,3 +197,17 @@ class PresenceConsumer(WebsocketConsumer):
 
     def presence_update(self, event):
         self.send(text_data=json.dumps(event["data"]))
+
+
+
+    def broadcast_presence(self, status):
+        contact_ids = async_to_sync(get_accepted_contacts_ids)(self.user_id)
+
+        for contact_id in contact_ids:
+            async_to_sync(self.channel_layer.group.send)(
+                f"presence_user_{contact_id}",
+                {
+                    "type": "presence_update",
+                    "data": {"user_id": self.user_id, "status": status,},
+                },
+            )   
